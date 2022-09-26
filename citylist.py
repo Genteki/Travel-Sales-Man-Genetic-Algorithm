@@ -5,11 +5,10 @@ class CityList:
         if arr is None: return
         self.citylist = np.array(arr, dtype=np.float32)
         self.n_city = self.citylist.shape[0]
+        self._distance = self.cal_city_distance_table()
 
     def get_city_distance(self, city1, city2):
-        n = ((self.citylist[city1,0] - self.citylist[city2,0]) ** 2 +
-              (self.citylist[city1,1] - self.citylist[city2,1]) ** 2)
-        return np.sqrt(n)
+        return self._distance[city1, city2]
 
     def get_route_length(self, route):
         l = 0
@@ -23,6 +22,15 @@ class CityList:
             cl = [line.strip().split(",") for line in lines]
         self.citylist = np.array(cl, dtype=np.float32)
         self.n_city = self.citylist.shape[0]
+        self._distance = self.cal_city_distance_table()
+
+    def cal_city_distance_table(self):
+        t = np.zeros((self.n_city, self.n_city))
+        for i in range(self.n_city):
+            for j in range(self.n_city):
+                t[i,j] = np.sqrt((self.citylist[i,0] - self.citylist[j,0]) ** 2 +
+                                 (self.citylist[i,1] - self.citylist[j,1]) ** 2)
+        return t
 
 def test():
     citylist = CityList()
