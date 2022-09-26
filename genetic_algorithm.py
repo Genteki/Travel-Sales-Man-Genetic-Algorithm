@@ -36,6 +36,13 @@ class GA(BaseModel):
         offspring = np.concatenate((dad_segment, mon_segment))
         return offspring
 
+    def crossover_tsp1000(self, p1, p2):
+        cross_points = np.random.randint(0, self.n_city, 2)
+        dad_segment = np.array(p2[cross_points.min():cross_points.max()+1])
+        mon_segment = np.array([bit for bit in p1 if bit not in dad_segment])
+        offspring = np.concatenate((dad_segment, mon_segment))
+        return offspring
+
     def mutate(self, gene):
         for pointA in range(self.n_city):
             if self.city.get_city_distance(pointA-1, pointA) > 0.5:
@@ -60,7 +67,7 @@ class GA(BaseModel):
             offspring = self.population[i].copy()
             if np.random.rand() < self.cross_rate:
                 j = np.random.randint(0, self.pop_size, size=1)
-                offspring = self.crossover(offspring, self.selected_pop[j].reshape(self.n_city))
+                offspring = self.crossover_tsp1000(offspring, self.selected_pop[j].reshape(self.n_city))
             offspring = self.mutate(offspring)
             new_pop[i] = offspring
         self.population = new_pop
@@ -79,13 +86,14 @@ def test(path="data/tsp4test.txt"):
     ga = GA(cl, pop_size=POPULATION_SIZE)
     last_best = ga.best_length
     plt.ion()
-    plt.scatter(cl.citylist.T[0], cl.citylist.T[1], marker=".", color="gray")
+    plt.scatter(cl.citylist.T[0], cl.citylist.T[1], marker=".", color="k",s=2.)
     for i in range(N_GENERATION):
         ga.evolute()
         print(i, ": ", ga.best_length)
         if ga.best_length < last_best:
+            last_best = ga.best_length
             new_pts = cl.citylist[ga.bestPath]
-            new_pts = np.r_[new_pts, [new_pts[0]]]
+            new_pts = np.r_[new_pts, [new_pts[0]] ]
             plt.gca().lines.clear()
             pls = plt.plot(new_pts.T[0], new_pts.T[1], linewidth=0.2, color = 'k'); plt.pause(0.05)
     plt.ioff(); plt.show()
