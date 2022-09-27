@@ -9,7 +9,7 @@ class CityList:
 
     def get_city_distance(self, city1, city2):
         return self._distance[city1, city2]
-
+    
     def get_route_length(self, route):
         l = 0
         for i in range(0, len(route)):
