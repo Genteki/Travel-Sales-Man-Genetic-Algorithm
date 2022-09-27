@@ -116,7 +116,7 @@ def test_2(path="circle"):
     cl.readtxt("data/tsp_{}.txt".format(path))
     ga = GA(cl, pop_size=POPULATION_SIZE)
     last_best = ga.best_length
-    file = open("output/long_ga_"+path, "w")
+    file = open("output/long_ga_"+path+".txt", "w")
     for i in range(N_GENERATION):
         ga.evolute()
         print(str(i), ",", ga.best_length)

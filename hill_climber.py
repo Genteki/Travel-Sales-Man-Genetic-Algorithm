@@ -21,14 +21,14 @@ class HillClimber(BaseModel):
                 neighbors.append(new_neighbor)
                 neighbors_length.append(self.city.get_route_length(new_neighbor))
         neighbors_length = np.array(neighbors_length, dtype=np.float32)
-        best_index = neighbors_length.argmin()
+        best_index = neighbors_length.argmax()
         best_neighbor = neighbors[best_index]
         return np.array(best_neighbor, dtype=np.int16)
 
     def climb(self):
         self.population[0] = self.find_next(self.population[0])
         self.get_route_length()
-        if self.route_length[0] < self.best_length:
+        if self.route_length[0] > self.best_length:
             self.best_length = self.route_length[0]
             self.best_path = self.population[0]
 
@@ -55,7 +55,19 @@ def test(path="data/tsp_circle.txt"):
             plt.plot(new_pts.T[0], new_pts.T[1], linewidth=1, color = 'k'); plt.pause(0.05)
     plt.ioff(); plt.show()
 
+def test_2(path="circle"):
+        cl = CityList()
+        cl.readtxt("data/tsp_"+path+".txt")
+        hc = HillClimber(cl, pop_size=POPULATION_SIZE)
+        last_best = hc.best_length
+        f = open("output/long_HillClimber_"+path+".txt", "w")
+        for i in range(N_GENERATION):
+            f.write(str(i)+","+str(last_best)+"\n")
+            hc.climb()
+            print(i, ",", hc.best_length)
+        f.close()
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
-    test("data/tsp_{}.txt".format(filename))
+    #test("data/tsp_{}.txt".format(filename))
+    test_2(filename)
