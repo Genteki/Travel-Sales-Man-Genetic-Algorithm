@@ -19,30 +19,6 @@ class RandomSearch(BaseModel):
         if self.route_length.min() < self.best_length:
             self.best_length = self.route_length.min()
 
-
-def test():
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set_style("whitegrid")
-
-    cl = CityList()
-    cl.readtxt("data/tsp4test.txt")
-    rs = RandomSearch(cl, POPULATION_SIZE)
-    best = []
-    worst = []
-    for i in range(N_GENERATION):
-        best.append(rs.best)
-        worst.append(rs.worst)
-        rs.random_route()
-        rs.get_route_length()
-        print(i, ":\ ", rs.route_length.min())
-    best = np.array(best, dtype=np.float32)
-    np.save("random_search_best.npy", best)
-    plt.plot(np.arange(N_GENERATION)*100, best)
-    plt.xlabel(r"$Evaluations \times 100$")
-    plt.ylabel(r"$Shortest\ Path$")
-    plt.title(r"Random Search", size="x-large")
-    plt.show()
 def test_2(path):
     cl = CityList()
     cl.readtxt("data/"+path)
