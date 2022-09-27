@@ -1,40 +1,24 @@
 from citylist import CityList
+from base_model import BaseModel
 from parameters import *
 import numpy as np
 
-class RandomSearch:
+class RandomSearch(BaseModel):
     def __init__(self, citylist, pop_size=POPULATION_SIZE):
-        self.city = citylist
-        self.pop_size = pop_size
-        self.n_city = self.city.n_city
-        self.population = None
-        self.route_length = np.zeros(self.pop_size)
-        self.best = None
-        self.worst = None
+        super(RandomSearch, self).__init__(citylist)
         self.first_generation()
-
-    def random_route(self):
-        p = []
-        for i in range(self.pop_size):
-            new_indvidual = np.arange(self.n_city)
-            np.random.shuffle(new_indvidual)
-            p.append(new_indvidual)
-        self.population = np.array(p, dtype=np.int16)
-        return
+        self.best_length = self.route_length.min()
 
     def first_generation(self):
         self.random_route()
         self.get_route_length()
-        self.best = self.route_length.min()
-        self.worst = self.route_length.max()
 
-    def get_route_length(self):
-        for i in range(self.pop_size):
-            self.route_length[i] = self.city.get_route_length(self.population[i])
-        if (self.best is None) or (self.route_length.min() < self.best):
-            self.best = self.route_length.min()
-        if (self.worst is None) or (self.route_length.max() > self.worst):
-            self.worst = self.route_length.max()
+    def evo(self):
+        self.random_route()
+        self.get_route_length()
+        if self.route_length.min() < self.best_length:
+            self.best_length = self.route_length.min()
+
 
 def test():
     import matplotlib.pyplot as plt
@@ -59,6 +43,18 @@ def test():
     plt.ylabel(r"$Shortest\ Path$")
     plt.title(r"Random Search", size="x-large")
     plt.show()
+def test_2(path):
+    cl = CityList()
+    cl.readtxt("data/"+path)
+    rs = RandomSearch(cl, pop_size=POPULATION_SIZE)
+    file = open("output/rs_"+path, "w")
+    for i in range(N_GENERATION):
+        rs.evo()
+        file.write(str(i)+","+str(rs.best_length)+"\n")
+        print(str(i)+","+str(rs.best_length)+"\n")
+    file.close()
 
 if __name__ == "__main__":
-    test()
+    import sys
+    filename = sys.argv[1]
+    test_2(filename)
