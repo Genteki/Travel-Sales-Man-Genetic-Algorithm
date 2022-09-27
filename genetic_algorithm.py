@@ -103,7 +103,21 @@ def test(path="data/tsp.txt"):
             plt.plot(new_pts.T[0], new_pts.T[1], linewidth=1, color = 'k'); plt.pause(0.05)
     plt.ioff(); plt.show()
 
+def test_2(path="circle"):
+    cl = CityList()
+    cl.readtxt("data/tsp_{}.txt".format(path))
+    file = open("output/short_ga_"+path+"_mut"+str(int(MUTATE_RATE*1000))+".txt", "w")
+    for p in range(10):
+        ga = GA(cl, pop_size=POPULATION_SIZE)
+        last_best = ga.best_length
+        for i in range(N_GENERATION):
+            ga.evolute()
+            print(str(i), ",", ga.best_length)
+            file.write(str(ga.best_length)+", ")
+        file.write("\n")
+    file.close()
+
 if __name__ == "__main__":
     filename = sys.argv[1]
-    test("data/tsp_{}.txt".format(filename))
-    #test()
+    #test("data/tsp_{}.txt".format(filename))
+    test_2()
