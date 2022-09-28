@@ -12,17 +12,19 @@ class GA(BaseModel):
         self.mutate_rate = mutate_rate
         self.fitness = self.fitness_exp()
         self.selected_pop = None
-        self.best_length = 10000
+        self.best_length = 0
         self.best_path = None
         self.get_route_length()
         self.find_best()
 
     def fitness_exp(self):
-        return np.exp(self.pop_size ** 2 / 20 / (self.route_length))
+        return np.exp( 20 * (self.route_length-self.route_length.min()))
         #return np.exp(self.pop_size*2/self.route_length)
 
     def select_parent(self):
         self.fitness = self.fitness_exp()
+        fitness_0 = np.argsort(self.fitness)[0:int(self.pop_size/2)]
+        self.fitness[fitness_0] = 0
         p = self.fitness / self.fitness.sum()
         selected_idx = np.random.choice(np.arange(self.pop_size),
                                         size=self.pop_size, replace=True, p=p)
@@ -48,8 +50,8 @@ class GA(BaseModel):
 
     def mutate(self, gene):
         for pointA in range(self.n_city):
-            if self.city.get_city_distance(pointA-1, pointA) > 5*np.pi/self.n_city:
-                rate = self.mutate_rate * 5
+            if self.city.get_city_distance(pointA-1, pointA) < 0.95:
+                rate = self.mutate_rate * 4
             else:
                 rate = self.mutate_rate
             if np.random.rand() < rate:
@@ -74,9 +76,9 @@ class GA(BaseModel):
         self.find_best()
 
     def find_best(self):
-        if self.route_length.min() < self.best_length:
-            self.bestPath = self.population[self.route_length.argmin()]
-            self.best_length = self.route_length.min()
+        if self.route_length.max() > self.best_length:
+            self.bestPath = self.population[self.route_length.argmax()]
+            self.best_length = self.route_length.max()
 
 
 def test(path="data/tsp.txt"):
@@ -94,7 +96,7 @@ def test(path="data/tsp.txt"):
     for i in range(N_GENERATION):
         ga.evolute()
         print(i, ",", ga.best_length)
-        if ga.best_length < last_best:
+        if ga.best_length > last_best:
             last_best = ga.best_length
             text_length.set_text("length: {}\ngeneration: {}".format(last_best.round(4), i))
             new_pts = cl.citylist[ga.bestPath]
@@ -106,18 +108,19 @@ def test(path="data/tsp.txt"):
 def test_2(path="circle"):
     cl = CityList()
     cl.readtxt("data/tsp_{}.txt".format(path))
-    file = open("output/short_ga_"+path+"_mut"+str(int(MUTATE_RATE*1000))+".txt", "w")
+    file = open("output/long_ga_"+path+"_mut"+str(int(MUTATE_RATE*1000))+".txt", "w")
     for p in range(10):
         ga = GA(cl, pop_size=POPULATION_SIZE)
         last_best = ga.best_length
-        for i in range(N_GENERATION):
+        file.write(str(ga.best_length))
+        for i in range(N_GENERATION-1):
             ga.evolute()
             print(str(i), ",", ga.best_length)
-            file.write(str(ga.best_length)+", ")
+            file.write(", "+str(ga.best_length))
         file.write("\n")
     file.close()
 
 if __name__ == "__main__":
     filename = sys.argv[1]
-    #test("data/tsp_{}.txt".format(filename))
-    test_2(filename)
+    test("data/tsp_{}.txt".format(filename))
+    #test_2(filename)

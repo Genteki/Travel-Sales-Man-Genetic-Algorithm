@@ -7,7 +7,7 @@ class RandomSearch(BaseModel):
     def __init__(self, citylist, pop_size=POPULATION_SIZE):
         super(RandomSearch, self).__init__(citylist)
         self.first_generation()
-        self.best_length = self.route_length.min()
+        self.best_length = self.route_length.max()
 
     def first_generation(self):
         self.random_route()
@@ -16,13 +16,13 @@ class RandomSearch(BaseModel):
     def evo(self):
         self.random_route()
         self.get_route_length()
-        if self.route_length.min() < self.best_length:
-            self.best_length = self.route_length.min()
+        if self.route_length.max() > self.best_length:
+            self.best_length = self.route_length.max()
 
 def test_2(path):
     cl = CityList()
     cl.readtxt("data/tsp_"+path+".txt")
-    file = open("output/short_rs_"+path, "w")
+    file = open("output/short_rs_"+path+".txt", "w")
     for p in range(10):
         rs = RandomSearch(cl, pop_size=POPULATION_SIZE)
         for i in range(N_GENERATION):
