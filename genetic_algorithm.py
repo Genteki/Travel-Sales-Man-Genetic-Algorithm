@@ -59,6 +59,13 @@ class GA(BaseModel):
                 gene[pointB] = cityA
         return gene
 
+    def select_next_gen(self, new_pop):
+        next_gen_fitness = np.zeros(new_pop.shape[0])
+        for i in range(new_pop.shape[0]):
+            self.citylist.get_route_length(new_pop[i])
+        next_gen_idx = next_gen_fitness.argsort()[:self.pop_size]
+        return new_pop[next_gen_idx]
+
     def evolute(self):
         new_pop = np.zeros_like(self.population)
         self.select_parent()
@@ -69,6 +76,7 @@ class GA(BaseModel):
                 offspring = self.crossover(offspring, self.selected_pop[j].reshape(self.n_city))
             offspring = self.mutate(offspring)
             new_pop[i] = offspring
+        #self.population = self.select_new_gen(new_pop)
         self.population = new_pop
         self.get_route_length()
         self.find_best()
