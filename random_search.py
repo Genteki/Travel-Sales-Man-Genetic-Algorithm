@@ -30,6 +30,7 @@ def test_2(path):
             file.write(str(rs.best_length)+",")
             print(str(i)+","+str(rs.best_length))
         file.write("\n")
+
     file.close()
 
 if __name__ == "__main__":

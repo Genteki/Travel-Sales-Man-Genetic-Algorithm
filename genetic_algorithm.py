@@ -7,12 +7,13 @@ import sys
 class GA(BaseModel):
     def __init__(self, city_list, pop_size=POPULATION_SIZE,
                  cross_rate=CROSS_RATE, mutate_rate=MUTATE_RATE):
-        super(GA, self).__init__(city_list)
+        super(GA, self).__init__(city_list, pop_size)
         self.cross_rate = cross_rate
         self.mutate_rate = mutate_rate
         self.fitness = self.fitness_exp()
         self.selected_pop = None
         self.best_length = 0
+
         self.best_path = None
         self.get_route_length()
         self.find_best()
@@ -20,6 +21,7 @@ class GA(BaseModel):
     def fitness_exp(self):
         return np.exp( 20 * (self.route_length-self.route_length.min()))
         #return np.exp(self.pop_size*2/self.route_length)
+
 
     def select_parent(self):
         self.fitness = self.fitness_exp()
@@ -50,8 +52,10 @@ class GA(BaseModel):
 
     def mutate(self, gene):
         for pointA in range(self.n_city):
+
+            #if self.city.get_city_distance(pointA-1, pointA) > 5*np.pi/self.n_city:
             if self.city.get_city_distance(pointA-1, pointA) < 0.95:
-                rate = self.mutate_rate * 4
+                rate = self.mutate_rate * 1
             else:
                 rate = self.mutate_rate
             if np.random.rand() < rate:
@@ -81,6 +85,7 @@ class GA(BaseModel):
             self.best_length = self.route_length.max()
 
 
+
 def test(path="data/tsp.txt"):
     import matplotlib.pyplot as plt
     cl = CityList()
@@ -92,7 +97,7 @@ def test(path="data/tsp.txt"):
     plt.axis('equal')
     plt.scatter(cl.citylist.T[0], cl.citylist.T[1], marker=".", color="k")
     text_length = plt.text(0.9, 0.9, "length: {}".format(last_best.round(4)))
-    title = plt.title("Shortest Path GA, n = {}".format(ga.n_city))
+    title = plt.title("Longest Path GA, n = {}".format(ga.n_city))
     for i in range(N_GENERATION):
         ga.evolute()
         print(i, ",", ga.best_length)
@@ -118,9 +123,11 @@ def test_2(path="circle"):
             print(str(i), ",", ga.best_length)
             file.write(", "+str(ga.best_length))
         file.write("\n")
+
     file.close()
 
 if __name__ == "__main__":
     filename = sys.argv[1]
     test("data/tsp_{}.txt".format(filename))
     #test_2(filename)
+
