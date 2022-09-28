@@ -18,7 +18,7 @@ class GA(BaseModel):
         self.find_best()
 
     def fitness_exp(self):
-        return np.exp(self.pop_size ** 2 / 20 / self.route_length)
+        return np.exp(self.pop_size ** 2 / 20 / (self.route_length))
         #return np.exp(self.pop_size*2/self.route_length)
 
     def select_parent(self):
@@ -66,7 +66,7 @@ class GA(BaseModel):
             offspring = self.population[i].copy()
             if np.random.rand() < self.cross_rate:
                 j = np.random.randint(0, self.pop_size, size=1)
-                offspring = self.crossover_tsp1000(offspring, self.selected_pop[j].reshape(self.n_city))
+                offspring = self.crossover(offspring, self.selected_pop[j].reshape(self.n_city))
             offspring = self.mutate(offspring)
             new_pop[i] = offspring
         self.population = new_pop
@@ -120,4 +120,4 @@ def test_2(path="circle"):
 if __name__ == "__main__":
     filename = sys.argv[1]
     #test("data/tsp_{}.txt".format(filename))
-    test_2()
+    test_2(filename)

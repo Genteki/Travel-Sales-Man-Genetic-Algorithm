@@ -55,7 +55,20 @@ def test(path="data/tsp_circle.txt"):
             plt.plot(new_pts.T[0], new_pts.T[1], linewidth=1, color = 'k'); plt.pause(0.05)
     plt.ioff(); plt.show()
 
+def test_2(path="circle"):
+    cl = CityList()
+    cl.readtxt("data/tsp_"+path+".txt")
+    file = open("output/short_hc_"+path, "w")
+    for p in range(10):
+        hc = HillClimber(cl, pop_size=POPULATION_SIZE)
+        for i in range(1500):
+            file.write(str(hc.best_length)+", ")
+            print(i, ": ", hc.best_length)
+            hc.climb()
+        file.write("\n")
+
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
-    test("data/tsp_{}.txt".format(filename))
+    test_2(filename)
+    #test("data/tsp_{}.txt".format(filename))

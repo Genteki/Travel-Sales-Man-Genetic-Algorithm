@@ -21,13 +21,15 @@ class RandomSearch(BaseModel):
 
 def test_2(path):
     cl = CityList()
-    cl.readtxt("data/"+path)
-    rs = RandomSearch(cl, pop_size=POPULATION_SIZE)
-    file = open("output/rs_"+path, "w")
-    for i in range(N_GENERATION):
-        rs.evo()
-        file.write(str(i)+","+str(rs.best_length)+"\n")
-        print(str(i)+","+str(rs.best_length)+"\n")
+    cl.readtxt("data/tsp_"+path+".txt")
+    file = open("output/short_rs_"+path, "w")
+    for p in range(10):
+        rs = RandomSearch(cl, pop_size=POPULATION_SIZE)
+        for i in range(N_GENERATION):
+            rs.evo()
+            file.write(str(rs.best_length)+",")
+            print(str(i)+","+str(rs.best_length))
+        file.write("\n")
     file.close()
 
 if __name__ == "__main__":
